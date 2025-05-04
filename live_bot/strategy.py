@@ -14,16 +14,13 @@ class Strategy:
         self.symbol = symbol
         self.TC = config.TC
         self.history = pd.DataFrame(columns=["timestamp", "spot", "futures"])
+        self.zm1 = None
 
     def update(self, timestamp, spot_price, futures_price):
         self.history.loc[timestamp] = [timestamp, spot_price, futures_price]
         self.history = self.history.tail(self.lookback + 5)
 
-    def get_signal(self) -> int:
-        if len(self.history) < self.lookback:
-            logger.info(f"Building history {self.symbol} {len(self.history)}/{self.lookback}...")
-            return 0
-
+    def calc_z_score(self) -> float:
         df = self.history.copy()
         df["spread"] = df["spot"] - df["futures"]
         mean = df["spread"].rolling(self.lookback).mean().iloc[-1]
@@ -33,7 +30,22 @@ class Strategy:
             return 0
 
         z = (df["spread"].iloc[-1] - mean) / std
+        return z
+
+    def get_signal(self) -> int:
+        if len(self.history) < self.lookback:
+            logger.info(f"Building history {self.symbol} {len(self.history)}/{self.lookback}...")
+            return 0
+        z = self.calc_z_score()
         logger.info(f"[STRATEGY] {self.symbol} Z-score: {round(z, 2)}")
+
+        if not self.zm1 is None:
+            if self.zm1 == 1 and z >= self.exit_z:
+                return 0
+            elif self.zm1 == -1 and z <= -self.exit_z:
+                return 0
+
+        self.zm1 = z
 
         if abs(z) < self.exit_z:
             return 0
