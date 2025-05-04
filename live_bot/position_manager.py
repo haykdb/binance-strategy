@@ -77,7 +77,6 @@
 # position_manager.py
 
 from datetime import datetime, timezone
-from loguru import logger
 
 
 class PositionManager:
@@ -115,7 +114,7 @@ class PositionManager:
         else:
             raise Exception("Invalid side.")
 
-        estimated_fee_rate = self.config.TC  # Total fee estimate (entry + exit)
+        estimated_fee_rate = 0.0004 # self.config.TC  # Total fee estimate (entry + exit)
         notional = (
             self.spot_entry_price
             + spot_exit_price
@@ -132,15 +131,15 @@ class PositionManager:
             "Side": self.side,
             "Symbol": self.symbol,
             "Size": round(self.size, 6),
-            "Spot Entry Price": round(self.spot_entry_price, 2),
-            "Spot Exit Price": round(spot_exit_price, 2),
-            "Futures Entry Price": round(self.futures_entry_price, 2),
-            "Futures Exit Price": round(futures_exit_price, 2),
+            "Spot Entry Price": round(self.spot_entry_price, 4),
+            "Spot Exit Price": round(spot_exit_price, 4),
+            "Futures Entry Price": round(self.futures_entry_price, 4),
+            "Futures Exit Price": round(futures_exit_price, 4),
             "Entry Time": self.entry_time.strftime("%Y-%m-%d %H:%M:%S"),
             "Exit Time": exit_time.strftime("%Y-%m-%d %H:%M:%S"),
-            "Spot PnL (USD)": round(spot_pnl, 2),
-            "Futures PnL (USD)": round(futures_pnl, 2),
-            "Total Net PnL (USD)": round(total_net_pnl, 2),
+            "Spot PnL (USD)": round(spot_pnl, 4),
+            "Futures PnL (USD)": round(futures_pnl, 4),
+            "Total Net PnL (USD)": round(total_net_pnl, 4),
             "Holding Duration (minutes)": holding_minutes,
         }
 
@@ -155,10 +154,9 @@ class PositionManager:
 
     def calc_closing_spot_pnl(self, exit_spot_price: float) -> float:
         if not self.is_open:
-            logger.warning(
+            raise ValueError(
                 f"Trying to calculate spot closing pnl when position is closed."
             )
-            return 0.0
         if self.side == "LONG":
             spot_pnl = (exit_spot_price - self.spot_entry_price) * self.size
         else:
@@ -167,10 +165,9 @@ class PositionManager:
 
     def calc_closing_futures_pnl(self, exit_futures_price: float) -> float:
         if not self.is_open:
-            logger.warning(
+            raise ValueError(
                 f"Trying to calculate futures closing pnl when position is closed."
             )
-            return 0.0
         if self.side == "LONG":
             futures_pnl = (self.futures_entry_price - exit_futures_price) * self.size
         else:

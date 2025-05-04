@@ -33,6 +33,19 @@ class StrategyCalculator:
         mean = np.mean(self.spread_history)
         return abs(self.spread_history[-1] - mean)
 
+    def check_is_short_spread_entry(self, zscore, exp_profit, exp_tc):
+        return zscore > self.configs.Z_ENTRY and exp_profit >= exp_tc
+
+    def check_is_long_spread_entry(self, zscore, exp_profit, exp_tc):
+        return zscore < -self.configs.Z_ENTRY and exp_profit >= exp_tc
+
+    def check_is_long_spread_exit(self, zscore):
+        return zscore > -self.configs.Z_EXIT
+
+    def check_is_short_spread_exit(self, zscore):
+        return zscore < self.configs.Z_EXIT
+
+
 # def update_spread(spot: float, futures: float):
 #     spread = spot - futures
 #     spread_history.append(spread)

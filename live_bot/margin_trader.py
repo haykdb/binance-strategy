@@ -1,6 +1,6 @@
 # margin_trader.py
 from loguru import logger
-import config
+import live_bot.config as config
 from binance.exceptions import BinanceAPIException
 import time
 
