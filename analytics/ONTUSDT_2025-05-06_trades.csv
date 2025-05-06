@@ -1,0 +1,3 @@
+Action,Side,Symbol,Size,Spot Entry Price,Spot Exit Price,Futures Entry Price,Futures Exit Price,Entry Time,Exit Time,Spot PnL (USD),Futures PnL (USD),Total Net PnL (USD),Holding Duration (minutes)
+OPEN,LONG,ONTUSDT,110.051,0.136,,0.1363,,,,,,,
+CLOSE,LONG,ONTUSDT,110.051,0.1363,0.1362,0.1363,0.1361,2025-05-06 11:31:20,2025-05-06 11:31:30,-0.011,0.0202,-0.0148,0.17

@@ -1,0 +1,2 @@
+Action,Side,Symbol,Size,Spot Entry Price,Spot Exit Price,Futures Entry Price,Futures Exit Price,Entry Time,Exit Time,Spot PnL (USD),Futures PnL (USD),Total Net PnL (USD),Holding Duration (minutes)
+OPEN,LONG,NKNUSDT,380.306,0.0393,,0.03944188,,,,,,,

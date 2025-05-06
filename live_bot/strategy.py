@@ -13,8 +13,9 @@ class Strategy:
         self.exit_z = config.STRATEGY_Z_EXIT
         self.symbol = symbol
         self.TC = config.TC
+        self.allow_short = config.ALLOW_SHORT_SPREAD
         self.history = pd.DataFrame(columns=["timestamp", "spot", "futures"])
-        self.zm1 = None
+        self.entry_signal_m1 = None
 
     def update(self, timestamp, spot_price, futures_price):
         self.history.loc[timestamp] = [timestamp, spot_price, futures_price]
@@ -39,19 +40,19 @@ class Strategy:
         z = self.calc_z_score()
         logger.info(f"[STRATEGY] {self.symbol} Z-score: {round(z, 2)}")
 
-        if not self.zm1 is None:
-            if self.zm1 == 1 and z >= self.exit_z:
+        if not self.entry_signal_m1 is None:
+            if self.entry_signal_m1 == 1 and z >= self.exit_z:
                 return 0
-            elif self.zm1 == -1 and z <= -self.exit_z:
+            elif self.entry_signal_m1 == -1 and z <= -self.exit_z:
                 return 0
-
-        self.zm1 = z
 
         if abs(z) < self.exit_z:
             return 0
-        elif z > self.entry_z:
+        elif z > self.entry_z and self.allow_short:
+            self.entry_signal_m1 = -1
             return -1
         elif z < -self.entry_z:
+            self.entry_signal_m1 = 1
             return 1
         return 2
 
